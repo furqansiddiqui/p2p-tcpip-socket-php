@@ -1,0 +1,28 @@
+{
+  "name": "furqansiddiqui/p2p-tcpip-socket-php",
+  "description": "Peer to peer networking over TCP/IP socket in PHP",
+  "type": "library",
+  "homepage": "https://github.com/furqansiddiqui/p2p-tcpip-socket-php",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Furqan A. Siddiqui",
+      "email": "hello@furqansiddiqui.com",
+      "homepage": "https://www.furqansiddiqui.com",
+      "role": "Author"
+    }
+  ],
+  "require": {
+    "php-64bit": "^7.2",
+    "ext-openssl": "*",
+    "ext-bcmath": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "FurqanSiddiqui\\P2PSocket\\": [
+        "src"
+      ]
+    }
+  },
+  "minimum-stability": "dev"
+}
