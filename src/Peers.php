@@ -78,6 +78,9 @@ class Peers
             $ipPeers = $this->ip2Peers($peer->ip());
             $ipPeers[] = $peer->port();
             $this->ip2PeerMap[$peer->ip()] = array_unique($ipPeers, SORT_NUMERIC);
+
+            // Call event
+            $this->p2pSocket->events()->onPeerConnect()->trigger([$peer]);
         }
     }
 }

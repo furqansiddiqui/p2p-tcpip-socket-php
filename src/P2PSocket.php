@@ -31,6 +31,8 @@ class P2PSocket
     private $peers;
     /** @var int */
     private $maxPeers;
+    /** @var Events */
+    private $events;
     /** @var bool */
     private $debug;
 
@@ -87,6 +89,7 @@ class P2PSocket
         // Init other props
         $this->maxPeers = $maxPeers;
         $this->peers = new Peers($this);
+        $this->events = new Events();
     }
 
     /**
@@ -101,6 +104,14 @@ class P2PSocket
         }
 
         throw new \OutOfBoundsException('Cannot get value of inaccessible property');
+    }
+
+    /**
+     * @return Events
+     */
+    public function events(): Events
+    {
+        return $this->events;
     }
 
     /**

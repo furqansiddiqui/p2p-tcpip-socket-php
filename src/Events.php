@@ -14,29 +14,20 @@ declare(strict_types=1);
 
 namespace FurqanSiddiqui\P2PSocket;
 
+use FurqanSiddiqui\P2PSocket\Events\Event;
+use FurqanSiddiqui\P2PSocket\Events\EventRegister;
+
 /**
- * Class SocketLastError
+ * Class Events
  * @package FurqanSiddiqui\P2PSocket
  */
-class SocketLastError
+class Events extends EventRegister
 {
-    /** @var null|int */
-    public $code;
-    /** @var null|string */
-    public $message;
-
     /**
-     * SocketLastError constructor.
-     * @param resource $socket
+     * @return Event
      */
-    public function __construct($socket)
+    public function onPeerConnect(): Event
     {
-        $errCode = socket_last_error($socket);
-        if ($errCode) {
-            $errString = socket_strerror($errCode);
-            $this->code = $errCode;
-            $this->message = $errString;
-        }
+        return $this->on("onPeerConnect");
     }
 }
-
