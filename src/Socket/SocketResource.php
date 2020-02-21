@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace FurqanSiddiqui\P2PSocket\Socket;
 
+use FurqanSiddiqui\P2PSocket\Exception\P2PSocketException;
+
 /**
  * Class SocketResource
  * @package FurqanSiddiqui\P2PSocket\Socket
@@ -66,5 +68,22 @@ class SocketResource
     public function lastError(): SocketLastError
     {
         return new SocketLastError($this);
+    }
+
+    /**
+     * @param bool $debug
+     * @return static
+     * @throws P2PSocketException
+     */
+    public static function Create(bool $debug = false): self
+    {
+        $socket = @socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+        if (!$socket) {
+            throw new P2PSocketException(
+                (new SocketLastError())->error2String('Failed to create socket', $debug)
+            );
+        }
+
+        return new self($socket);
     }
 }
