@@ -15,7 +15,8 @@
   "require": {
     "php-64bit": "^7.2",
     "ext-openssl": "*",
-    "ext-bcmath": "*"
+    "ext-bcmath": "*",
+    "ext-sockets": "*"
   },
   "autoload": {
     "psr-4": {
