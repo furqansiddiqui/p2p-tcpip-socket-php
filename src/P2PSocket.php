@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace FurqanSiddiqui\P2PSocket;
 
 use FurqanSiddiqui\P2PSocket\Exception\P2PSocketException;
-use FurqanSiddiqui\P2PSocket\Socket\SocketLastError;
 use FurqanSiddiqui\P2PSocket\Socket\SocketResource;
 
 /**
@@ -41,15 +40,13 @@ class P2PSocket
      * @param string $bindIpAddress
      * @param int $port
      * @param int $maxPeers
-     * @param bool|null $debug
+     * @param bool $debug
      * @throws P2PSocketException
      */
-    public function __construct(string $bindIpAddress, int $port, int $maxPeers, ?bool $debug = null)
+    public function __construct(string $bindIpAddress, int $port, int $maxPeers, bool $debug = false)
     {
         // Set debugging mode?
-        if (is_bool($debug)) {
-            $this->debug = $debug;
-        }
+        $this->debug = $debug;
 
         // Maximum Peers
         if ($maxPeers < 0x01 || $maxPeers > 0xff) {
@@ -65,15 +62,8 @@ class P2PSocket
             throw new P2PSocketException('Invalid socket listen port');
         }
 
-        $socket = @socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-        if (!$socket) {
-            throw new P2PSocketException(
-                (new SocketLastError())->error2String('Failed to create listener socket', $this->debug)
-            );
-        }
-
         // Save socket resource
-        $this->socket = new SocketResource($socket);
+        $this->socket = SocketResource::Create($this->debug);
         if (!@socket_bind($this->socket->resource(), $bindIpAddress, $port)) {
             throw new P2PSocketException(
                 $this->socket->lastError()->error2String('Failed to bind listen IP and port', $this->debug)
@@ -112,6 +102,17 @@ class P2PSocket
     public function events(): Events
     {
         return $this->events;
+    }
+
+    /**
+     * @param string $remotePeerAddr
+     * @param int $port
+     * @throws Exception\PeerConnectException
+     * @throws P2PSocketException
+     */
+    public function connect(string $remotePeerAddr, int $port): void
+    {
+        $this->peers->connect($remotePeerAddr, $port);
     }
 
     /**
