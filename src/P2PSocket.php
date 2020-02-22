@@ -70,7 +70,7 @@ class P2PSocket
             );
         }
 
-        if (!@socket_listen($this->socket->resource(), $this->maxPeers)) {
+        if (!@socket_listen($this->socket->resource(), $maxPeers)) {
             throw new P2PSocketException(
                 $this->socket->lastError()->error2String('Failed to start listener', $this->debug)
             );
