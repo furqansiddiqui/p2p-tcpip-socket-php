@@ -14,8 +14,6 @@
   ],
   "require": {
     "php-64bit": "^7.2",
-    "ext-openssl": "*",
-    "ext-bcmath": "*",
     "ext-sockets": "*"
   },
   "autoload": {
