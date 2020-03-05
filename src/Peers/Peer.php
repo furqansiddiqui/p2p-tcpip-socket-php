@@ -46,10 +46,7 @@ class Peer
     {
         if (!@socket_getpeername($peer->resource(), $ip, $port)) {
             throw new PeerConnectException(
-                $peer->lastError()->error2String(
-                    sprintf('A new peer connection (#%d) failed', $num),
-                    $p2pSocket->debug
-                )
+                $peer->lastError()->error2String(sprintf('A new peer connection (#%d) failed', $num))
             );
         }
 
@@ -82,6 +79,11 @@ class Peer
     public function port(): int
     {
         return $this->port;
+    }
+
+    public function send(string $message): bool
+    {
+
     }
 
     /**

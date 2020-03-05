@@ -63,16 +63,16 @@ class P2PSocket
         }
 
         // Save socket resource
-        $this->socket = SocketResource::Create($this->debug);
+        $this->socket = SocketResource::Create($this);
         if (!@socket_bind($this->socket->resource(), $bindIpAddress, $port)) {
             throw new P2PSocketException(
-                $this->socket->lastError()->error2String('Failed to bind listen IP and port', $this->debug)
+                $this->socket->lastError()->error2String('Failed to bind listen IP and port')
             );
         }
 
         if (!@socket_listen($this->socket->resource(), $maxPeers)) {
             throw new P2PSocketException(
-                $this->socket->lastError()->error2String('Failed to start listener', $this->debug)
+                $this->socket->lastError()->error2String('Failed to start listener')
             );
         }
 

@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace FurqanSiddiqui\P2PSocket\Socket;
 
 use FurqanSiddiqui\P2PSocket\Exception\P2PSocketException;
+use FurqanSiddiqui\P2PSocket\P2PSocket;
 
 /**
  * Class SocketResource
@@ -22,19 +23,23 @@ use FurqanSiddiqui\P2PSocket\Exception\P2PSocketException;
  */
 class SocketResource
 {
+    /** @var P2PSocket */
+    private $p2pSocket;
     /** @var resource */
     private $resource;
 
     /**
      * SocketResource constructor.
+     * @param P2PSocket $p2pSocket
      * @param $socket
      */
-    public function __construct($socket)
+    public function __construct(P2PSocket $p2pSocket, $socket)
     {
         if (!is_resource($socket)) {
             throw new \InvalidArgumentException('Argument is not a valid resource');
         }
 
+        $this->p2pSocket = $p2pSocket;
         $this->resource = $socket;
     }
 
@@ -67,23 +72,23 @@ class SocketResource
      */
     public function lastError(): SocketLastError
     {
-        return new SocketLastError($this);
+        return new SocketLastError($this->p2pSocket, $this);
     }
 
     /**
-     * @param bool $debug
+     * @param P2PSocket $p2pSocket
      * @return static
      * @throws P2PSocketException
      */
-    public static function Create(bool $debug = false): self
+    public static function Create(P2PSocket $p2pSocket): self
     {
         $socket = @socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         if (!$socket) {
             throw new P2PSocketException(
-                (new SocketLastError())->error2String('Failed to create socket', $debug)
+                (new SocketLastError($p2pSocket))->error2String('Failed to create socket')
             );
         }
 
-        return new self($socket);
+        return new self($p2pSocket, $socket);
     }
 }

@@ -14,12 +14,16 @@ declare(strict_types=1);
 
 namespace FurqanSiddiqui\P2PSocket\Socket;
 
+use FurqanSiddiqui\P2PSocket\P2PSocket;
+
 /**
  * Class SocketLastError
  * @package FurqanSiddiqui\P2PSocket\Socket
  */
 class SocketLastError
 {
+    /** @var P2PSocket */
+    private $p2pSocket;
     /** @var null|int */
     public $code;
     /** @var null|string */
@@ -27,10 +31,12 @@ class SocketLastError
 
     /**
      * SocketLastError constructor.
+     * @param P2PSocket $p2pSocket
      * @param SocketResource|null $socket
      */
-    public function __construct(?SocketResource $socket = null)
+    public function __construct(P2PSocket $p2pSocket, ?SocketResource $socket = null)
     {
+        $this->p2pSocket = $p2pSocket;
         $resource = $socket ? $socket->resource() : null;
         $errCode = socket_last_error($resource);
         if ($errCode) {
@@ -42,17 +48,16 @@ class SocketLastError
 
     /**
      * @param string|null $message
-     * @param bool $debug
      * @return string
      */
-    public function error2String(?string $message = null, bool $debug = false): string
+    public function error2String(?string $message = null): string
     {
         $exceptionMsg = "";
         if ($message) {
             $exceptionMsg .= trim($message) . " ";
         }
 
-        if ($debug) {
+        if ($this->p2pSocket->debug) {
             $exceptionMsg .= sprintf("[#%d] %s", $this->code, $this->message);
         }
 

@@ -70,7 +70,7 @@ class Peers
         $num = $this->count + 1;
         $peerSocket = @socket_accept($this->p2pSocket->socket()->resource());
         if ($peerSocket) {
-            $peer = new Peer($this->p2pSocket, new SocketResource($peerSocket), $num);
+            $peer = new Peer($this->p2pSocket, new SocketResource($this->p2pSocket, $peerSocket), $num);
             $this->peerIsConnected($peer);
         }
     }
@@ -91,7 +91,7 @@ class Peers
             throw new PeerConnectException('Invalid remote peer port');
         }
 
-        $socket = SocketResource::Create($this->p2pSocket->debug);
+        $socket = SocketResource::Create($this->p2pSocket);
         if (!@socket_connect($socket->resource(), $remotePeerAddr, $port)) {
             throw new PeerConnectException(
                 $socket->lastError()->error2String(
