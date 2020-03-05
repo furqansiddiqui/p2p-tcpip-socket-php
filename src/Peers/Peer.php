@@ -31,6 +31,8 @@ class Peer
     private $master;
     /** @var SocketResource */
     private $socket;
+    /** @var bool */
+    private $connected;
     /** @var string */
     private $name;
     /** @var string */
@@ -54,6 +56,7 @@ class Peer
         }
 
         $this->master = $p2pSocket;
+        $this->connected = true;
         $this->ip = $ip;
         $this->port = $port;
         $this->name = sprintf('%s:%d', $this->ip, $this->port);
@@ -82,6 +85,14 @@ class Peer
     public function port(): int
     {
         return $this->port;
+    }
+
+    /**
+     * @return bool
+     */
+    public function status(): bool
+    {
+        return $this->connected;
     }
 
     /**
@@ -143,6 +154,7 @@ class Peer
         }
 
         @socket_close($this->socket->resource());
+        $this->connected = false;
         $this->master->peers()->remove($this); // Remove from peers list
     }
 
