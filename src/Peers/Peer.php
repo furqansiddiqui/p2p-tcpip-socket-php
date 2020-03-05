@@ -15,6 +15,9 @@ declare(strict_types=1);
 namespace FurqanSiddiqui\P2PSocket\Peers;
 
 use FurqanSiddiqui\P2PSocket\Exception\PeerConnectException;
+use FurqanSiddiqui\P2PSocket\Exception\PeerException;
+use FurqanSiddiqui\P2PSocket\Exception\PeerReadException;
+use FurqanSiddiqui\P2PSocket\Exception\PeerWriteException;
 use FurqanSiddiqui\P2PSocket\P2PSocket;
 use FurqanSiddiqui\P2PSocket\Socket\SocketResource;
 
@@ -81,9 +84,65 @@ class Peer
         return $this->port;
     }
 
-    public function send(string $message): bool
+    /**
+     * @param int $length
+     * @return string
+     * @throws PeerReadException
+     */
+    public function read(int $length = 1024): string
     {
+        $buffer = "";
+        $recv = @socket_recv($this->socket->resource(), $buffer, $length, MSG_DONTWAIT);
+        if ($recv === false) {
+            $socketLastErr = $this->socket()->lastError();
+            if ($socketLastErr->code === 11) {
+                return ""; // Check if its temporarily unavailable (still connected but no data to read!)
+            }
 
+            throw new PeerReadException(
+                $this,
+                $socketLastErr->error2String(sprintf('Failed to read peer "%s"', $this->name))
+            );
+        } elseif ($recv === 0) {
+            // Connection is no longer valid, remote has been disconnected
+            $this->master->events()->onPeerDisconnect()->trigger([$this]);
+        }
+
+        return $buffer;
+    }
+
+    /**
+     * @param string $message
+     * @throws PeerWriteException
+     */
+    public function send(string $message): void
+    {
+        $send = @socket_write($this->socket->resource(), $message);
+        if ($send === false) {
+            throw new PeerWriteException(
+                $this,
+                $this->socket->lastError()->error2String(sprintf('Failed to write to peer "%s"', $this->name))
+            );
+        }
+    }
+
+    /**
+     * @param bool $suppressExceptions
+     * @throws PeerException
+     */
+    public function disconnect(bool $suppressExceptions = false): void
+    {
+        // Shutdown socket
+        $shutdown = @socket_shutdown($this->socket->resource(), 2);
+        if (!$shutdown) {
+            if (!$suppressExceptions) {
+                throw new PeerException($this->socket->lastError()->error2String(
+                    sprintf('Failed to shutdown socket to peer "%s"', $this->name)
+                ));
+            }
+        }
+
+        @socket_close($this->socket->resource());
     }
 
     /**
