@@ -15,8 +15,11 @@ declare(strict_types=1);
 namespace FurqanSiddiqui\P2PSocket;
 
 use FurqanSiddiqui\P2PSocket\Exception\PeerConnectException;
+use FurqanSiddiqui\P2PSocket\Exception\PeerReadException;
 use FurqanSiddiqui\P2PSocket\Exception\PeerWriteException;
 use FurqanSiddiqui\P2PSocket\Peers\Peer;
+use FurqanSiddiqui\P2PSocket\Peers\PeersMessages;
+use FurqanSiddiqui\P2PSocket\Peers\PeersReadMessage;
 use FurqanSiddiqui\P2PSocket\Socket\SocketResource;
 
 /**
@@ -52,6 +55,14 @@ class Peers
     public function count(): int
     {
         return $this->count;
+    }
+
+    /**
+     * @return array
+     */
+    public function all(): array
+    {
+        return $this->peers;
     }
 
     /**
@@ -130,6 +141,36 @@ class Peers
         }
 
         return $sent;
+    }
+
+    /**
+     * @param int $length
+     * @param callable|null $failPeerCallback
+     * @return PeersMessages
+     * @throws PeerReadException
+     */
+    public function read(int $length = 1024, ?callable $failPeerCallback = null): PeersMessages
+    {
+        $messages = new PeersMessages();
+
+        /** @var Peer $peer */
+        foreach ($this->peers as $peerName => $peer) {
+            try {
+                $peerMsg = $peer->read($length);
+                if (is_string($peerMsg) && strlen($peerMsg) > 0) {
+                    $messages->append(new PeersReadMessage($peer, $peerMsg));
+                }
+            } catch (PeerReadException $e) {
+                if ($failPeerCallback) {
+                    call_user_func_array($failPeerCallback, [$peer]);
+                    continue;
+                }
+
+                throw $e;
+            }
+        }
+
+        return $messages;
     }
 
     /**
