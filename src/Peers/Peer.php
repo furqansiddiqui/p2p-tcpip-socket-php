@@ -121,7 +121,7 @@ class Peer
             $this->master->events()->onPeerDisconnect()->trigger([$this]);
         }
 
-        return $buffer;
+        return strval($buffer);
     }
 
     /**
