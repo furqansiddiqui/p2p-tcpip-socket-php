@@ -30,4 +30,12 @@ class Events extends EventRegister
     {
         return $this->on("onPeerConnect");
     }
+
+    /**
+     * @return Event
+     */
+    public function onPeerDisconnect(): Event
+    {
+        return $this->on("onPeerDisconnect");
+    }
 }
