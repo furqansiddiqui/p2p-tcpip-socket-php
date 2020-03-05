@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace FurqanSiddiqui\P2PSocket;
 
 use FurqanSiddiqui\P2PSocket\Exception\PeerConnectException;
+use FurqanSiddiqui\P2PSocket\Exception\PeerWriteException;
 use FurqanSiddiqui\P2PSocket\Peers\Peer;
 use FurqanSiddiqui\P2PSocket\Socket\SocketResource;
 
@@ -102,6 +103,49 @@ class Peers
 
         $peer = new Peer($this->p2pSocket, $socket, ($this->count + 1));
         $this->peerIsConnected($peer);
+    }
+
+    /**
+     * @param string $message
+     * @param callable|null $failPeerCallback
+     * @return int
+     * @throws PeerWriteException
+     */
+    public function broadcast(string $message, ?callable $failPeerCallback = null): int
+    {
+        $sent = 0;
+        /** @var Peer $peer */
+        foreach ($this->peers as $peerName => $peer) {
+            try {
+                $peer->send($message);
+                $sent++;
+            } catch (PeerWriteException $e) {
+                if ($failPeerCallback) {
+                    call_user_func_array($failPeerCallback, [$peer]);
+                    continue;
+                }
+
+                throw $e;
+            }
+        }
+
+        return $sent;
+    }
+
+    /**
+     * Removes a peer from register WITHOUT DISCONNECTING
+     * @param Peer $peer
+     */
+    public function remove(Peer $peer): void
+    {
+        if (array_key_exists($peer->name(), $this->peers)) {
+            unset($this->peers[$peer->name()]);
+            $this->count--;
+
+            $ipPeers = $this->ip2Peers($peer->ip());
+            unset($ipPeers[array_search($peer->port(), $ipPeers)]);
+            $this->ip2PeerMap[$peer->ip()] = array_unique($ipPeers, SORT_NUMERIC);
+        }
     }
 
     /**
