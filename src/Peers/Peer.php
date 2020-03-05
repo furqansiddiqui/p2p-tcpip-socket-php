@@ -143,6 +143,7 @@ class Peer
         }
 
         @socket_close($this->socket->resource());
+        $this->master->peers()->remove($this); // Remove from peers list
     }
 
     /**
