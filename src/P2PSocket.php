@@ -105,6 +105,14 @@ class P2PSocket
     }
 
     /**
+     * @return Peers
+     */
+    public function peers(): Peers
+    {
+        return $this->peers;
+    }
+
+    /**
      * @param string $remotePeerAddr
      * @param int $port
      * @throws Exception\PeerConnectException
