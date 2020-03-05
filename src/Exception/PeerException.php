@@ -15,9 +15,9 @@ declare(strict_types=1);
 namespace FurqanSiddiqui\P2PSocket\Exception;
 
 /**
- * Class PeerConnectException
+ * Class PeerException
  * @package FurqanSiddiqui\P2PSocket\Exception
  */
-class PeerConnectException extends PeerException
+class PeerException extends P2PSocketException
 {
 }
