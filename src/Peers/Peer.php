@@ -116,6 +116,8 @@ class Peer
             );
         } elseif ($recv === 0) {
             // Connection is no longer valid, remote has been disconnected
+            $this->connected = false;
+            $this->master->peers()->remove($this);
             $this->master->events()->onPeerDisconnect()->trigger([$this]);
         }
 
@@ -156,6 +158,9 @@ class Peer
         @socket_close($this->socket->resource());
         $this->connected = false;
         $this->master->peers()->remove($this); // Remove from peers list
+
+        // Trigger to Event Listeners
+        $this->master->events()->onPeerDisconnect()->trigger([$this]);
     }
 
     /**
