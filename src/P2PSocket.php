@@ -24,7 +24,7 @@ use FurqanSiddiqui\P2PSocket\Socket\SocketResource;
  */
 class P2PSocket
 {
-    /** @var SocketResource */
+    /** @var SocketResource|null */
     private $socket;
     /** @var Peers */
     private $peers;
@@ -37,13 +37,11 @@ class P2PSocket
 
     /**
      * P2PSocket constructor.
-     * @param string $bindIpAddress
-     * @param int $port
      * @param int $maxPeers
      * @param bool $debug
      * @throws P2PSocketException
      */
-    public function __construct(string $bindIpAddress, int $port, int $maxPeers, bool $debug = false)
+    public function __construct(int $maxPeers, bool $debug = false)
     {
         // Set debugging mode?
         $this->debug = $debug;
@@ -51,6 +49,23 @@ class P2PSocket
         // Maximum Peers
         if ($maxPeers < 0x01 || $maxPeers > 0xff) {
             throw new P2PSocketException('Max peers argument must be a valid single byte unsigned integer');
+        }
+
+        // Init other props
+        $this->maxPeers = $maxPeers;
+        $this->peers = new Peers($this);
+        $this->events = new Events();
+    }
+
+    /**
+     * @param string $bindIpAddress
+     * @param int $port
+     * @throws P2PSocketException
+     */
+    public function createServer(string $bindIpAddress, int $port): void
+    {
+        if ($this->socket) {
+            throw new P2PSocketException('Socket server was already created');
         }
 
         // Validate arguments
@@ -70,16 +85,11 @@ class P2PSocket
             );
         }
 
-        if (!@socket_listen($this->socket->resource(), $maxPeers)) {
+        if (!@socket_listen($this->socket->resource(), $this->maxPeers)) {
             throw new P2PSocketException(
                 $this->socket->lastError()->error2String('Failed to start listener')
             );
         }
-
-        // Init other props
-        $this->maxPeers = $maxPeers;
-        $this->peers = new Peers($this);
-        $this->events = new Events();
     }
 
     /**
@@ -125,9 +135,14 @@ class P2PSocket
 
     /**
      * @throws Exception\PeerConnectException
+     * @throws P2PSocketException
      */
     public function listen(): void
     {
+        if (!$this->socket) {
+            throw new P2PSocketException('Cannot use listen method, socket server was never created');
+        }
+
         $this->socket->setNonBlockMode(); // Set non-block mode
 
         $remain = $this->maxPeers - $this->peers->count();
@@ -141,9 +156,9 @@ class P2PSocket
     }
 
     /**
-     * @return SocketResource
+     * @return SocketResource|null
      */
-    public function socket(): SocketResource
+    public function socket(): ?SocketResource
     {
         return $this->socket;
     }

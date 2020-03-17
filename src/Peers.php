@@ -79,6 +79,10 @@ class Peers
      */
     public function accept(): void
     {
+        if (!$this->p2pSocket->socket()) {
+            throw new PeerConnectException('Cannot use Peers::accept method, socket server was never created');
+        }
+
         $num = $this->count + 1;
         $peerSocket = @socket_accept($this->p2pSocket->socket()->resource());
         if ($peerSocket) {
