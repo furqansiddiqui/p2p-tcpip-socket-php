@@ -84,18 +84,18 @@ class Peer
     }
 
     /**
-     * @param string $flag
+     * @param int $flag
      * @return bool
      */
-    public function hasFlag(string $flag): bool
+    public function hasFlag(int $flag): bool
     {
         return ($this->flags & $flag) ? true : false;
     }
 
     /**
-     * @param string $flag
+     * @param int $flag
      */
-    public function removeFlag(string $flag): void
+    public function removeFlag(int $flag): void
     {
         $this->flags &= ~$flag;
     }
