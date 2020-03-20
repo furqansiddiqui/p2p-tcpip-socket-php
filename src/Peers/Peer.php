@@ -27,15 +27,6 @@ use FurqanSiddiqui\P2PSocket\Socket\SocketResource;
  */
 class Peer
 {
-    public const FLAG_1 = 0x01;
-    public const FLAG_2 = 0x02;
-    public const FLAG_3 = 0x04;
-    public const FLAG_4 = 0x08;
-    public const FLAG_5 = 0x10;
-    public const FLAG_6 = 0x20;
-    public const FLAG_7 = 0x40;
-    public const FLAG_8 = 0x80;
-
     /** @var P2PSocket */
     private $master;
     /** @var SocketResource */
@@ -48,8 +39,10 @@ class Peer
     private $ip;
     /** @var int */
     private $port;
-    /** @var int */
+    /** @var PeerFlags Arbitrary bitwise flags */
     private $flags;
+    /** @var PeerData Arbitrary data */
+    private $data;
 
     /**
      * Peer constructor.
@@ -72,32 +65,8 @@ class Peer
         $this->port = $port;
         $this->name = sprintf('%s:%d', $this->ip, $this->port);
         $this->socket = $peer;
-        $this->flags = 0;
-    }
-
-    /**
-     * @param int $flag
-     */
-    public function addFlag(int $flag): void
-    {
-        $this->flags = $this->flags | $flag;
-    }
-
-    /**
-     * @param int $flag
-     * @return bool
-     */
-    public function hasFlag(int $flag): bool
-    {
-        return ($this->flags & $flag) ? true : false;
-    }
-
-    /**
-     * @param int $flag
-     */
-    public function removeFlag(int $flag): void
-    {
-        $this->flags &= ~$flag;
+        $this->flags = new PeerFlags();
+        $this->data = new PeerData();
     }
 
     /**
@@ -206,5 +175,21 @@ class Peer
     public function socket(): SocketResource
     {
         return $this->socket;
+    }
+
+    /**
+     * @return PeerFlags
+     */
+    public function flags(): PeerFlags
+    {
+        return $this->flags;
+    }
+
+    /**
+     * @return PeerData
+     */
+    public function data(): PeerData
+    {
+        return $this->data;
     }
 }
