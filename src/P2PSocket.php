@@ -134,10 +134,11 @@ class P2PSocket
     }
 
     /**
+     * @param int|null $queue
      * @throws Exception\PeerConnectException
      * @throws P2PSocketException
      */
-    public function listen(): void
+    public function listen(?int $queue = null): void
     {
         if (!$this->socket) {
             throw new P2PSocketException('Cannot use listen method, socket server was never created');
@@ -145,7 +146,7 @@ class P2PSocket
 
         $this->socket->setNonBlockMode(); // Set non-block mode
 
-        $remain = $this->maxPeers - $this->peers->count();
+        $remain = $queue ? $queue : $this->maxPeers - $this->peers->count();
         if ($remain > 0) {
             for ($i = 0; $i <= $remain; $i++) {
                 $this->peers->accept();
