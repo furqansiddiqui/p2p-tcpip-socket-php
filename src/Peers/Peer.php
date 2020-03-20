@@ -27,6 +27,15 @@ use FurqanSiddiqui\P2PSocket\Socket\SocketResource;
  */
 class Peer
 {
+    public const FLAG_1 = 0x01;
+    public const FLAG_2 = 0x02;
+    public const FLAG_3 = 0x04;
+    public const FLAG_4 = 0x08;
+    public const FLAG_5 = 0x10;
+    public const FLAG_6 = 0x20;
+    public const FLAG_7 = 0x40;
+    public const FLAG_8 = 0x80;
+
     /** @var P2PSocket */
     private $master;
     /** @var SocketResource */
@@ -39,6 +48,8 @@ class Peer
     private $ip;
     /** @var int */
     private $port;
+    /** @var int */
+    private $flags;
 
     /**
      * Peer constructor.
@@ -61,6 +72,32 @@ class Peer
         $this->port = $port;
         $this->name = sprintf('%s:%d', $this->ip, $this->port);
         $this->socket = $peer;
+        $this->flags = 0;
+    }
+
+    /**
+     * @param int $flag
+     */
+    public function addFlag(int $flag): void
+    {
+        $this->flags = $this->flags | $flag;
+    }
+
+    /**
+     * @param string $flag
+     * @return bool
+     */
+    public function hasFlag(string $flag): bool
+    {
+        return ($this->flags & $flag) ? true : false;
+    }
+
+    /**
+     * @param string $flag
+     */
+    public function removeFlag(string $flag): void
+    {
+        $this->flags &= ~$flag;
     }
 
     /**
