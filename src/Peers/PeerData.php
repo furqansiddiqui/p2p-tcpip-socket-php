@@ -33,18 +33,22 @@ class PeerData
 
     /**
      * @param string $key
-     * @param string $value
+     * @param $value
      */
-    public function set(string $key, string $value): void
+    public function set(string $key, $value): void
     {
+        if (!is_scalar($value)) {
+            throw new \InvalidArgumentException('Cannot store a non-scalar value in PeerData obj');
+        }
+
         $this->data[strtolower($key)] = $value;
     }
 
     /**
      * @param string $key
-     * @return string|null
+     * @return mixed|null
      */
-    public function get(string $key): ?string
+    public function get(string $key)
     {
         return $this->data[strtolower($key)] ?? null;
     }
