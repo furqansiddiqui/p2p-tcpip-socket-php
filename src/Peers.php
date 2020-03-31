@@ -94,10 +94,11 @@ class Peers
     /**
      * @param string $remotePeerAddr
      * @param int $port
+     * @param int $timeOut
      * @throws Exception\P2PSocketException
      * @throws PeerConnectException
      */
-    public function connect(string $remotePeerAddr, int $port): void
+    public function connect(string $remotePeerAddr, int $port, ?int $timeOut = null): void
     {
         if (!filter_var($remotePeerAddr, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
             throw new PeerConnectException('Invalid remote IPv4 peer address');
@@ -108,16 +109,57 @@ class Peers
         }
 
         $socket = SocketResource::Create($this->p2pSocket);
-        if (!@socket_connect($socket->resource(), $remotePeerAddr, $port)) {
-            throw new PeerConnectException(
-                $socket->lastError()->error2String(
-                    sprintf('Peer connection to "%s" on port %d failed', $remotePeerAddr, $port)
-                )
-            );
-        }
 
-        $peer = new Peer($this->p2pSocket, $socket, ($this->count + 1));
-        $this->peerIsConnected($peer);
+        try {
+            if (!$timeOut) {
+                if (!@socket_connect($socket->resource(), $remotePeerAddr, $port)) {
+                    throw new PeerConnectException(
+                        $socket->lastError()->error2String(
+                            sprintf('Peer connection to "%s" on port %d failed', $remotePeerAddr, $port)
+                        )
+                    );
+                }
+
+                $peer = new Peer($this->p2pSocket, $socket, ($this->count + 1));
+                $this->peerIsConnected($peer);
+                return;
+            }
+
+            // With timeout
+            $socket->setNonBlockMode();
+            $connected = false;
+            $maxAttempts = $timeOut * 100;
+            $attempt = 0;
+            while (true) {
+                if ($attempt >= $maxAttempts) {
+                    break;
+                }
+
+                $connected = @socket_connect($socket->resource(), $remotePeerAddr, $port);
+                if (!$connected) {
+                    $lastError = socket_last_error($socket->resource());
+                    if ($lastError !== SOCKET_EINPROGRESS && $lastError !== SOCKET_EALREADY) {
+                        throw new PeerConnectException(
+                            $socket->lastError()->error2String(
+                                sprintf('Peer connection to "%s" on port %d failed (timeOut: %d)', $remotePeerAddr, $port, $timeOut)
+                            )
+                        );
+                    }
+
+                    usleep(10000); // sleep 1/100 of a second
+                }
+            }
+
+            $socket->setBlockMode();
+            if (!$connected) {
+                throw new PeerConnectException(
+                    sprintf('Connection timed out at %ds to peer "%s" on port %d', $timeOut, $remotePeerAddr, $port)
+                );
+            }
+        } catch (PeerConnectException $e) {
+           @socket_close($socket->resource());
+           throw $e;
+        }
     }
 
     /**
