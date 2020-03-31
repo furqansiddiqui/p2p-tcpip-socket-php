@@ -135,6 +135,7 @@ class Peers
                     break;
                 }
 
+                $attempt++;
                 $connected = @socket_connect($socket->resource(), $remotePeerAddr, $port);
                 if (!$connected) {
                     $lastError = socket_last_error($socket->resource());
@@ -157,8 +158,8 @@ class Peers
                 );
             }
         } catch (PeerConnectException $e) {
-           @socket_close($socket->resource());
-           throw $e;
+            @socket_close($socket->resource());
+            throw $e;
         }
     }
 
