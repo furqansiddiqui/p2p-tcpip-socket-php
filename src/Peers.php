@@ -157,6 +157,10 @@ class Peers
                     sprintf('Connection timed out at %ds to peer "%s" on port %d', $timeOut, $remotePeerAddr, $port)
                 );
             }
+
+            $peer = new Peer($this->p2pSocket, $socket, ($this->count + 1));
+            $this->peerIsConnected($peer);
+            return;
         } catch (PeerConnectException $e) {
             @socket_close($socket->resource());
             throw $e;
