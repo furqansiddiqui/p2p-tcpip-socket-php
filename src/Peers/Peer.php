@@ -136,7 +136,7 @@ class Peer
      */
     public function send(string $message): void
     {
-        $send = @socket_write($this->socket->resource(), $message);
+        $send = @socket_write($this->socket->resource(), $message . $this->master->delimiter);
         if ($send === false) {
             throw new PeerWriteException(
                 $this,

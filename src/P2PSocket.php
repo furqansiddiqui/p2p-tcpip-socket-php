@@ -21,6 +21,7 @@ use FurqanSiddiqui\P2PSocket\Socket\SocketResource;
  * Class P2PSocket
  * @package FurqanSiddiqui\P2PSocket
  * @property-read bool $debug
+ * @property-read string $delimiter
  */
 class P2PSocket
 {
@@ -34,6 +35,8 @@ class P2PSocket
     private $events;
     /** @var bool */
     private $debug;
+    /** @var string */
+    private $delimiter;
 
     /**
      * P2PSocket constructor.
@@ -55,6 +58,7 @@ class P2PSocket
         $this->maxPeers = $maxPeers;
         $this->peers = new Peers($this);
         $this->events = new Events();
+        $this->delimiter = "\n";
     }
 
     /**
@@ -101,9 +105,19 @@ class P2PSocket
         switch ($prop) {
             case "debug":
                 return $this->debug ?? false;
+            case "delimiter":
+                return $this->delimiter;
         }
 
         throw new \OutOfBoundsException('Cannot get value of inaccessible property');
+    }
+
+    /**
+     * @param string $delimiter
+     */
+    public function setDelimiter(string $delimiter): void
+    {
+        $this->delimiter = $delimiter;
     }
 
     /**
