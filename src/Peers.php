@@ -230,6 +230,15 @@ class Peers
     }
 
     /**
+     * @param string $name
+     * @return bool
+     */
+    public function has(string $name): bool
+    {
+        return array_key_exists($name, $this->peers);
+    }
+
+    /**
      * Removes a peer from register WITHOUT DISCONNECTING
      * @param Peer $peer
      */
