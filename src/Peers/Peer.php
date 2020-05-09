@@ -43,6 +43,8 @@ class Peer
     private $flags;
     /** @var PeerData Arbitrary data */
     private $data;
+    /** @var string */
+    private $recvBuffer;
 
     /**
      * Peer constructor.
@@ -67,6 +69,7 @@ class Peer
         $this->socket = $peer;
         $this->flags = new PeerFlags();
         $this->data = new PeerData();
+        $this->recvBuffer = "";
     }
 
     /**
@@ -103,17 +106,17 @@ class Peer
 
     /**
      * @param int $length
-     * @return string
+     * @return array|null
      * @throws PeerReadException
      */
-    public function read(int $length = 1024): string
+    public function read(int $length = 1024): ?array
     {
         $buffer = "";
         $recv = @socket_recv($this->socket->resource(), $buffer, $length, MSG_DONTWAIT);
         if ($recv === false) {
             $socketLastErr = $this->socket()->lastError();
             if ($socketLastErr->code === 11) {
-                return ""; // Check if its temporarily unavailable (still connected but no data to read!)
+                return []; // Check if its temporarily unavailable (still connected but no data to read!)
             }
 
             throw new PeerReadException(
@@ -125,9 +128,42 @@ class Peer
             $this->connected = false;
             $this->master->peers()->remove($this);
             $this->master->events()->onPeerDisconnect()->trigger([$this]);
+            return null;
         }
 
-        return strval($buffer);
+        // Append to existing buffer
+        $this->recvBuffer .= $buffer;
+
+        // Check if delimiter char exists
+        if (strpos($this->recvBuffer, $this->master->delimiter) === false) { // No delimiter char?
+            return []; // Keep buffer intact, no complete messages to return yet!
+        }
+
+        $recvBuffer = explode($this->master->delimiter, $this->recvBuffer);
+        $this->recvBuffer = array_pop($recvBuffer); // Last incomplete message now stays in recvBuffer
+
+        return $recvBuffer; // Return complete messages (delimited by delimiter char)
+    }
+
+    /**
+     * Get incomplete message in recv buffer
+     * @return string|null
+     */
+    public function bufferPendingMsg(): ?string
+    {
+        if ($this->recvBuffer) {
+            return $this->recvBuffer;
+        }
+
+        return null;
+    }
+
+    /**
+     * Cleans pending recv buffer
+     */
+    public function bufferClean(): void
+    {
+        $this->recvBuffer = "";
     }
 
     /**

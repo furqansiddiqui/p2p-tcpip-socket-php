@@ -207,9 +207,8 @@ class Peers
         /** @var Peer $peer */
         foreach ($this->peers as $peerName => $peer) {
             try {
-                $peerMsgBuffer = $peer->read($length);
-                if (is_string($peerMsgBuffer) && strlen($peerMsgBuffer) > 0) {
-                    $peerMsgs = explode($this->p2pSocket->delimiter, $peerMsgBuffer);
+                $peerMsgs = $peer->read($length);
+                if ($peerMsgs) {
                     foreach ($peerMsgs as $peerMsg) {
                         if ($peerMsg) {
                             $messages->append(new PeersReadMessage($peer, $peerMsg));
