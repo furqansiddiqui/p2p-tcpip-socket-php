@@ -24,7 +24,7 @@ use FurqanSiddiqui\P2PSocket\P2PSocket;
 class SocketResource
 {
     /** @var P2PSocket */
-    private $p2pSocket;
+    private P2PSocket $p2pSocket;
     /** @var resource */
     private $resource;
 

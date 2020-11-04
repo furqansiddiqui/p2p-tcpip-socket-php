@@ -19,11 +19,11 @@ namespace FurqanSiddiqui\P2PSocket\Peers;
 class PeersMessages implements \Iterator, \Countable
 {
     /** @var array */
-    private $messages;
+    private array $messages;
     /** @var int */
-    private $count;
+    private int $count;
     /** @var int */
-    private $pos;
+    private int $pos;
 
     /**
      * PeersMessages constructor.

@@ -21,7 +21,7 @@ namespace FurqanSiddiqui\P2PSocket\Peers;
 class PeerFlags
 {
     /** @var int */
-    private $flags;
+    private int $flags;
 
     /**
      * PeerFlags constructor.

@@ -24,7 +24,7 @@ use Throwable;
 class PeerCommunicateException extends P2PSocketException
 {
     /** @var Peer */
-    private $peer;
+    private Peer $peer;
 
     /**
      * PeerCommunicateException constructor.

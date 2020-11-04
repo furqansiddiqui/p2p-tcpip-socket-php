@@ -26,17 +26,17 @@ use FurqanSiddiqui\P2PSocket\Socket\SocketResource;
 class P2PSocket
 {
     /** @var SocketResource|null */
-    private $socket;
+    private ?SocketResource $socket = null;
     /** @var Peers */
-    private $peers;
+    private Peers $peers;
     /** @var int */
-    private $maxPeers;
+    private int $maxPeers;
     /** @var Events */
-    private $events;
+    private Events $events;
     /** @var bool */
-    private $debug;
+    private bool $debug;
     /** @var string */
-    private $delimiter;
+    private string $delimiter;
 
     /**
      * P2PSocket constructor.

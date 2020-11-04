@@ -23,11 +23,11 @@ use FurqanSiddiqui\P2PSocket\P2PSocket;
 class SocketLastError
 {
     /** @var P2PSocket */
-    private $p2pSocket;
+    private P2PSocket $p2pSocket;
     /** @var null|int */
-    public $code;
+    public ?int $code = null;
     /** @var null|string */
-    public $message;
+    public ?string $message = null;
 
     /**
      * SocketLastError constructor.

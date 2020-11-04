@@ -29,13 +29,13 @@ use FurqanSiddiqui\P2PSocket\Socket\SocketResource;
 class Peers
 {
     /** @var P2PSocket */
-    private $p2pSocket;
+    private P2PSocket $p2pSocket;
     /** @var int */
-    private $count;
+    private int $count;
     /** @var array */
-    private $peers;
+    private array $peers;
     /** @var array */
-    private $ip2PeerMap;
+    private array $ip2PeerMap;
 
     /**
      * Peers constructor.
@@ -94,7 +94,7 @@ class Peers
     /**
      * @param string $remotePeerAddr
      * @param int $port
-     * @param int $timeOut
+     * @param int|null $timeOut
      * @throws Exception\P2PSocketException
      * @throws PeerConnectException
      */
@@ -217,7 +217,7 @@ class Peers
                 }
             } catch (PeerReadException $e) {
                 if ($failPeerCallback) {
-                    call_user_func_array($failPeerCallback, [$peer]);
+                    call_user_func_array($failPeerCallback, [$peer, $e]);
                     continue;
                 }
 

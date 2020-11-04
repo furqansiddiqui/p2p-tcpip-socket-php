@@ -21,9 +21,9 @@ namespace FurqanSiddiqui\P2PSocket\Peers;
 class PeersReadMessage
 {
     /** @var Peer */
-    private $peer;
+    private Peer $peer;
     /** @var string */
-    private $message;
+    private string $message;
 
     /**
      * PeersReadMessage constructor.

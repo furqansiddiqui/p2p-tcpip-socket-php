@@ -14,15 +14,18 @@ declare(strict_types=1);
 
 namespace FurqanSiddiqui\P2PSocket\Events;
 
-
+/**
+ * Class Event
+ * @package FurqanSiddiqui\P2PSocket\Events
+ */
 class Event
 {
     /** @var EventRegister */
-    private $register;
+    private EventRegister $register;
     /** @var string */
-    private $name;
+    private string $name;
     /** @var array */
-    private $listeners;
+    private array $listeners;
 
     /**
      * Event constructor.

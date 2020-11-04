@@ -21,7 +21,7 @@ namespace FurqanSiddiqui\P2PSocket\Peers;
 class PeerData
 {
     /** @var array */
-    private $data;
+    private array $data;
 
     /**
      * PeerData constructor.

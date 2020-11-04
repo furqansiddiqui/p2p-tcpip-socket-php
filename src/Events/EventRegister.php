@@ -21,7 +21,7 @@ namespace FurqanSiddiqui\P2PSocket\Events;
 class EventRegister
 {
     /** @var array */
-    private $events;
+    private array $events;
 
     /**
      * EventsRegister constructor.

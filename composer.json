@@ -13,7 +13,7 @@
     }
   ],
   "require": {
-    "php-64bit": "^7.2",
+    "php-64bit": "^7.4",
     "ext-sockets": "*"
   },
   "autoload": {

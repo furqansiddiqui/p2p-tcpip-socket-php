@@ -28,23 +28,23 @@ use FurqanSiddiqui\P2PSocket\Socket\SocketResource;
 class Peer
 {
     /** @var P2PSocket */
-    private $master;
+    private P2PSocket $master;
     /** @var SocketResource */
-    private $socket;
+    private SocketResource $socket;
     /** @var bool */
-    private $connected;
+    private bool $connected;
     /** @var string */
-    private $name;
+    private string $name;
     /** @var string */
-    private $ip;
+    private string $ip;
     /** @var int */
-    private $port;
+    private int $port;
     /** @var PeerFlags Arbitrary bitwise flags */
-    private $flags;
+    private PeerFlags $flags;
     /** @var PeerData Arbitrary data */
-    private $data;
+    private PeerData $data;
     /** @var string */
-    private $recvBuffer;
+    private string $recvBuffer;
 
     /**
      * Peer constructor.
