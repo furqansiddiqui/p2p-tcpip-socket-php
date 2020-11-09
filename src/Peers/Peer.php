@@ -174,10 +174,8 @@ class Peer
     {
         $send = @socket_write($this->socket->resource(), $message . $this->master->delimiter);
         if ($send === false) {
-            throw new PeerWriteException(
-                $this,
-                $this->socket->lastError()->error2String(sprintf('Failed to write to peer "%s"', $this->name))
-            );
+            // Note: cannot use "$this->socket()->lastError()" here because "resource" is already gone
+            throw new PeerWriteException($this, sprintf('Failed to write to peer "%s"', $this->name));
         }
     }
 
