@@ -64,7 +64,6 @@ class Peer
         // Check if IP is from private range and is allowed
         $p2pSocket->privateIPRangeCheck($ip);
 
-
         $this->master = $p2pSocket;
         $this->connected = true;
         $this->ip = $ip;
