@@ -176,10 +176,11 @@ class P2PSocket
 
     /**
      * @param int|null $queue
-     * @throws Exception\PeerConnectException
+     * @param callable|null $callbackOnEachFail
      * @throws P2PSocketException
+     * @throws PeerConnectException
      */
-    public function listen(?int $queue = null): void
+    public function listen(?int $queue = null, ?callable $callbackOnEachFail = null): void
     {
         if (!$this->socket) {
             throw new P2PSocketException('Cannot use listen method, socket server was never created');
@@ -190,7 +191,15 @@ class P2PSocket
         $remain = $queue ? $queue : $this->maxPeers - $this->peers->count();
         if ($remain > 0) {
             for ($i = 0; $i <= $remain; $i++) {
-                $this->peers->accept();
+                try {
+                    $this->peers->accept();
+                } catch (PeerConnectException $e) {
+                    if (!$callbackOnEachFail) {
+                        throw $e;
+                    }
+
+                    call_user_func_array($callbackOnEachFail, [$i, $e]);
+                }
             }
         }
 
