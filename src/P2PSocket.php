@@ -104,9 +104,6 @@ class P2PSocket
             throw new P2PSocketException('Invalid IPv4 host address');
         }
 
-        // Check if IP is from private range and is allowed
-        $this->privateIPRangeCheck($bindIpAddress);
-
         if ($port < 0x3e8 || $port > 0xffff) {
             throw new P2PSocketException('Invalid socket listen port');
         }
