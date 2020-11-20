@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace FurqanSiddiqui\P2PSocket;
 
 use FurqanSiddiqui\P2PSocket\Exception\P2PSocketException;
+use FurqanSiddiqui\P2PSocket\Exception\PeerConnectException;
 use FurqanSiddiqui\P2PSocket\Socket\SocketResource;
 
 /**
@@ -37,6 +38,8 @@ class P2PSocket
     private bool $debug;
     /** @var string */
     private string $delimiter;
+    /** @var bool */
+    private bool $allowPrivateIPs;
 
     /**
      * P2PSocket constructor.
@@ -59,6 +62,30 @@ class P2PSocket
         $this->peers = new Peers($this);
         $this->events = new Events();
         $this->delimiter = "\n";
+        $this->allowPrivateIPs = true;
+    }
+
+    /**
+     * @param bool $allow
+     * @return $this
+     */
+    public function allowPrivateIPRange(bool $allow): self
+    {
+        $this->allowPrivateIPs = $allow;
+        return $this;
+    }
+
+    /**
+     * @param string $validIP
+     * @throws PeerConnectException
+     */
+    public function privateIPRangeCheck(string $validIP): void
+    {
+        if (!$this->allowPrivateIPs) {
+            if (!filter_var($validIP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+                throw new PeerConnectException('Connections to/from private IP ranges are disabled');
+            }
+        }
     }
 
     /**
@@ -76,6 +103,9 @@ class P2PSocket
         if (!filter_var($bindIpAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
             throw new P2PSocketException('Invalid IPv4 host address');
         }
+
+        // Check if IP is from private range and is allowed
+        $this->privateIPRangeCheck($bindIpAddress);
 
         if ($port < 0x3e8 || $port > 0xffff) {
             throw new P2PSocketException('Invalid socket listen port');
