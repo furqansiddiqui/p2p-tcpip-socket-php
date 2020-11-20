@@ -244,6 +244,15 @@ class Peers
     }
 
     /**
+     * @param string $ip
+     * @return bool
+     */
+    public function hasIPAddr(string $ip): bool
+    {
+        return array_key_exists($ip, $this->ip2PeerMap);
+    }
+
+    /**
      * Removes a peer from register WITHOUT DISCONNECTING
      * @param Peer $peer
      */
