@@ -95,10 +95,11 @@ class Peers
      * @param string $remotePeerAddr
      * @param int $port
      * @param int|null $timeOut
+     * @param bool $waitForAccept
      * @throws Exception\P2PSocketException
      * @throws PeerConnectException
      */
-    public function connect(string $remotePeerAddr, int $port, ?int $timeOut = null): void
+    public function connect(string $remotePeerAddr, int $port, ?int $timeOut = null, bool $waitForAccept = true): void
     {
         if (!filter_var($remotePeerAddr, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
             throw new PeerConnectException('Invalid remote IPv4 peer address');
@@ -139,7 +140,12 @@ class Peers
                 $connected = @socket_connect($socket->resource(), $remotePeerAddr, $port);
                 if (!$connected) {
                     $lastError = socket_last_error($socket->resource());
-                    if ($lastError !== SOCKET_EINPROGRESS && $lastError !== SOCKET_EALREADY) {
+                    if ($lastError === SOCKET_EISCONN && !$waitForAccept) { // Connection is established, may yet not be accepted from peer!
+                        $connected = true;
+                        break;
+                    }
+
+                    if (!in_array($lastError, [SOCKET_EINPROGRESS, SOCKET_EALREADY])) {
                         throw new PeerConnectException(
                             $socket->lastError()->error2String(
                                 sprintf('Peer connection to "%s" on port %d failed (timeOut: %d)', $remotePeerAddr, $port, $timeOut)
