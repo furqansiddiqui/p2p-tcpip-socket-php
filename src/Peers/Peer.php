@@ -112,6 +112,14 @@ class Peer
     }
 
     /**
+     * @return int
+     */
+    public function connectionType(): int
+    {
+        return $this->bound;
+    }
+
+    /**
      * @return string
      */
     public function ip(): string
