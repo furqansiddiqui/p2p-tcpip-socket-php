@@ -31,6 +31,8 @@ class Peer
     private P2PSocket $master;
     /** @var SocketResource */
     private SocketResource $socket;
+    /** @var int */
+    private int $bound;
     /** @var bool */
     private bool $connected;
     /** @var string */
@@ -47,13 +49,38 @@ class Peer
     private string $recvBuffer;
 
     /**
+     * @param P2PSocket $p2pSocket
+     * @param SocketResource $peer
+     * @param int $num
+     * @return static
+     * @throws PeerConnectException
+     */
+    public static function Inbound(P2PSocket $p2pSocket, SocketResource $peer, int $num): self
+    {
+        return new self($p2pSocket, P2PSocket::INBOUND_PEER, $peer, $num);
+    }
+
+    /**
+     * @param P2PSocket $p2pSocket
+     * @param SocketResource $peer
+     * @param int $num
+     * @return static
+     * @throws PeerConnectException
+     */
+    public static function Outbound(P2PSocket $p2pSocket, SocketResource $peer, int $num): self
+    {
+        return new self($p2pSocket, P2PSocket::OUTBOUND_PEER, $peer, $num);
+    }
+
+    /**
      * Peer constructor.
      * @param P2PSocket $p2pSocket
+     * @param int $bound
      * @param SocketResource $peer
      * @param int $num
      * @throws PeerConnectException
      */
-    public function __construct(P2PSocket $p2pSocket, SocketResource $peer, int $num)
+    private function __construct(P2PSocket $p2pSocket, int $bound, SocketResource $peer, int $num)
     {
         if (!@socket_getpeername($peer->resource(), $ip, $port)) {
             throw new PeerConnectException(
@@ -65,6 +92,7 @@ class Peer
         $p2pSocket->privateIPRangeCheck($ip);
 
         $this->master = $p2pSocket;
+        $this->bound = $bound;
         $this->connected = true;
         $this->ip = $ip;
         $this->port = $port;

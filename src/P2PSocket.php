@@ -26,6 +26,11 @@ use FurqanSiddiqui\P2PSocket\Socket\SocketResource;
  */
 class P2PSocket
 {
+    /** @var int Peer connection was accepted */
+    public const INBOUND_PEER = 0x80;
+    /** @var int Connection was established "to" peer */
+    public const OUTBOUND_PEER = 0xff;
+
     /** @var SocketResource|null */
     private ?SocketResource $socket = null;
     /** @var Peers */

@@ -86,7 +86,7 @@ class Peers
         $num = $this->count + 1;
         $peerSocket = @socket_accept($this->p2pSocket->socket()->resource());
         if ($peerSocket) {
-            $peer = new Peer($this->p2pSocket, new SocketResource($this->p2pSocket, $peerSocket), $num);
+            $peer = Peer::Inbound($this->p2pSocket, new SocketResource($this->p2pSocket, $peerSocket), $num);
             $this->peerIsConnected($peer);
         }
     }
@@ -121,7 +121,7 @@ class Peers
                     );
                 }
 
-                $peer = new Peer($this->p2pSocket, $socket, ($this->count + 1));
+                $peer = Peer::Outbound($this->p2pSocket, $socket, ($this->count + 1));
                 $this->peerIsConnected($peer);
                 return;
             }
@@ -164,7 +164,7 @@ class Peers
                 );
             }
 
-            $peer = new Peer($this->p2pSocket, $socket, ($this->count + 1));
+            $peer = Peer::Outbound($this->p2pSocket, $socket, ($this->count + 1));
             $this->peerIsConnected($peer);
             return;
         } catch (PeerConnectException $e) {
