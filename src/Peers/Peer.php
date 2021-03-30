@@ -47,6 +47,10 @@ class Peer
     private PeerData $data;
     /** @var string */
     private string $recvBuffer;
+    /** @var int */
+    private int $connectedOn;
+    /** @var int|null */
+    private ?int $lastMsgsReceived = null;
 
     /**
      * @param P2PSocket $p2pSocket
@@ -101,6 +105,7 @@ class Peer
         $this->flags = new PeerFlags();
         $this->data = new PeerData();
         $this->recvBuffer = "";
+        $this->connectedOn = time();
     }
 
     /**
@@ -144,6 +149,22 @@ class Peer
     }
 
     /**
+     * @return int
+     */
+    public function connectedOn(): int
+    {
+        return $this->connectedOn;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function lastMsgsReceivedOn(): ?int
+    {
+        return $this->lastMsgsReceived;
+    }
+
+    /**
      * @param int $length
      * @return array|null
      * @throws PeerReadException
@@ -180,7 +201,7 @@ class Peer
 
         $recvBuffer = explode($this->master->delimiter, $this->recvBuffer);
         $this->recvBuffer = array_pop($recvBuffer); // Last incomplete message now stays in recvBuffer
-
+        $this->lastMsgsReceived = time();
         return $recvBuffer; // Return complete messages (delimited by delimiter char)
     }
 
